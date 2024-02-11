@@ -21,8 +21,9 @@ data_long as (
         value 'value'
 )
 select
-    -- cast(sample_id as sample_ids) as sample_id
-    sample_id
-    , cast(gene_enst as gene_enst_ids)
+    -- TARGET samples will be NULL
+    try_cast(sample_id as sample_ids) as sample_id
+    , cast(gene_enst as gene_enst_ids) as gene_enst
     , cast("value" as REAL) as "value"
-from data_long;
+from data_long
+where sample_id is not null;

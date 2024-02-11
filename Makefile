@@ -83,11 +83,24 @@ database_targets: \
 	$(DATA)/toil-xena-hub/TcgaTargetGtex_RSEM_isoform_fpkm.done \
 	$(DATA)/toil-xena-hub/TcgaTargetGtex_rsem_isoform_tpm.done
 
-$(DATA)/create_indices.done: $(RAW_DATA) $(UNZIPPED)
+$(DATA)/create_indices.done: $(INDEX_DATA) $(UNZIPPED)
 	$(SHELL) scripts/create_indices.sh $(DATA) $(DUCKDB) $(DB) $(abspath scripts/create_indices.sql) \
 	&& touch $@
 
 # GDC
+
+.PHONY: gdc
+
+gdc: $(DATA)/create_indices.done gdc_targets
+
+gdc_targets: \
+	$(DATA)/gdc-hub/GDC-PANCAN.basic_phenotype.done \
+	$(DATA)/gdc-hub/GDC-PANCAN.cnv.done \
+	$(DATA)/gdc-hub/GDC-PANCAN.gistic.done \
+	$(DATA)/gdc-hub/GDC-PANCAN.htseq_fpkm-uq.done \
+	$(DATA)/gdc-hub/GDC-PANCAN.masked_cnv.done \
+	$(DATA)/gdc-hub/GDC-PANCAN.mutect2_snv.done \
+	$(DATA)/gdc-hub/gencode.v22.annotation.gene.probeMap.done
 
 $(DATA)/gdc-hub/%.done: $(DATA)/gdc-hub/%
 	export DATAPATH="$<"; \
@@ -102,6 +115,19 @@ $(DATA)/gdc-hub/%.done: $(DATA)/gdc-hub/%.tsv.gz
 	touch $@
 
 # Toil
+
+.PHONY: toil
+
+toil: $(DATA)/create_indices.done toil_targets
+
+toil_targets: \
+	$(DATA)/toil-xena-hub/mc3.v0.2.8.PUBLIC.toil.xena.done \
+	$(DATA)/toil-xena-hub/probeMap%2Fgencode.v23.annotation.transcript.probemap.done \
+	$(DATA)/toil-xena-hub/probeMap%2Fhugo_gencode_good_hg38_v23comp_probemap.done \
+	$(DATA)/toil-xena-hub/TCGA_GTEX_category.done \
+	$(DATA)/toil-xena-hub/TcgaTargetGtex_RSEM_Hugo_norm_count.done \
+	$(DATA)/toil-xena-hub/TcgaTargetGtex_RSEM_isoform_fpkm.done \
+	$(DATA)/toil-xena-hub/TcgaTargetGtex_rsem_isoform_tpm.done
 
 $(DATA)/toil-xena-hub/%.done: $(DATA)/toil-xena-hub/%
 	export DATAPATH="$<"; \
@@ -123,6 +149,10 @@ $(DATA)/toil-xena-hub/%.done: $(DATA)/toil-xena-hub/%.txt
 
 # CPTAC
 
+.PHONY: cptac
+
+cptac: $(filter %cptac-pancancer-data%, $(DATABASE_TARGETS)) $(CPTAC_HET_SCHEMA_TARGETS)
+
 $(DATA)/cptac-pancancer-data/%.done: $(UNZIPPED)
 	export DATAPATH="$(DATA)/cptac-pancancer-data/*/*_$**"; \
 	export REGEX="/(\w+)_$*"; \
@@ -132,7 +162,9 @@ $(DATA)/cptac-pancancer-data/%.done: $(UNZIPPED)
 # CPTAC data with heterogenous schema
 $(DATA)/cptac-pancancer-data/%.hetschema: $(DATA)/cptac-pancancer-data/%.done
 	@for cancer in BRCA CCRCC COAD GBM HNSCC LSCC LUAD OV PDAC UCEC; do \
-		export DATAPATH="$(DATA)/cptac-pancancer-data/$$cancer/$$cancer_$**"; \
+		export DATADIR="$(DATA)"; \
+		export CANCER="$$cancer"; \
+		export DATASET="$*"; \
 		$(DUCKDB) $(DB) -bail -c ".read scripts/CPTAC-$*-hetschema.sql"; \
 	done && \
 	touch $@

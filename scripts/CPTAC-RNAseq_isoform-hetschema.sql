@@ -11,7 +11,12 @@ with data_wide as (
         try_cast(regexp_extract("filename", '/(\w+)_RNAseq_isoform', 1) as cancer_ids) as cancer
         , regexp_extract("filename", 'log2_(\w+).txt', 1) as cancer_status
         , * exclude ("filename") 
-    from read_csv(getenv('DATAPATH'), sep='\t', header=True, filename=True)
+    from read_csv(
+        concat(getenv('DATADIR'), '/cptac-pancancer-data/', getenv('CANCER'), '/', getenv('CANCER'), '_', getenv('DATASET'), '*'),
+        sep='\t',
+        header=True,
+        filename=True
+    )
 ),
 data_long as (
     unpivot data_wide
@@ -24,7 +29,9 @@ insert into cptac_rnaseq_isoform
 select
     cancer
     , cancer_status
-    , cast(sample_id as sample_ids) as sample_id
-    , cast(idx as gene_enst_ids) as gene_enst
+    -- , cast(sample_id as sample_ids) as sample_id
+    -- , cast(idx as gene_enst_ids) as gene_enst
+    , sample_id
+    , idx as gene_enst
     , try_cast("value" as REAL) as "value"
 from data_long;

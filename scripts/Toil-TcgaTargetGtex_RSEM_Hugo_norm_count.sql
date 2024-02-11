@@ -23,11 +23,12 @@ data_long as (
         value 'value'
 )
 select
-    -- cast(sample_id as sample_ids) as sample_id
-    sample_id
+    -- TARGET samples will be NULL
+    try_cast(sample_id as sample_ids) as sample_id
     , cast(gene_name as gene_name_ids) as gene_name
     , cast("value" as REAL) as "value"
-from data_long;
+from data_long
+where sample_id is not null;
 
 alter table toil_tcgatargetgtex_rsem_hugo_norm_count
 add column "assembly" assembly_ids default 'hg19';

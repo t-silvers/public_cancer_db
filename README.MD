@@ -18,3 +18,9 @@ With custom configuration:
 ```bash
 make -C /path/to/public_cancer_db DATA="/path/to/large_data_storage" MEMORY_LIMIT=32GB NCORES=16 DOWNLOADER=aria2
 ```
+
+Adding GDC data to an existing database:
+
+```bash
+make gdc -C /path/to/public_cancer_db DB="/path/to/data.db"
+```

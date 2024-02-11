@@ -28,6 +28,14 @@ URLS := \
 	https://toil-xena-hub.s3.us-east-1.amazonaws.com/download/TcgaTargetGtex_RSEM_isoform_fpkm.gz \
 	https://toil-xena-hub.s3.us-east-1.amazonaws.com/download/TcgaTargetGtex_rsem_isoform_tpm.gz
 
+INDEX_DATA := \
+	$(DATA)/gdc-hub/GDC-PANCAN.basic_phenotype.tsv.gz \
+	$(DATA)/gdc-hub/gencode.v22.annotation.gene.probeMap \
+	$(DATA)/toil-xena-hub/probeMap%2Fgencode.v23.annotation.transcript.probemap \
+	$(DATA)/toil-xena-hub/TCGA_GTEX_category.txt \
+	$(DATA)/toil-xena-hub/probeMap%2Fhugo_gencode_good_hg38_v23comp_probemap \
+	$(DATA)/toil-xena-hub/mc3.v0.2.8.PUBLIC.toil.xena.gz
+
 DATABASE_TARGETS := \
 	$(DATA)/cptac-pancancer-data/meta.done \
 	$(DATA)/cptac-pancancer-data/proteomics.done \
