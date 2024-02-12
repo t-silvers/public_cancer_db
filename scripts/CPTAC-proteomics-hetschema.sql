@@ -4,12 +4,10 @@ set memory_limit = getenv('MEMORY_LIMIT');
 set preserve_insertion_order = false;
 set threads to getenv('NCORES');
 
--- create table cptac_proteomics (project_id varchar, cancer_status varchar, sample_id sample_ids, gene_ensg gene_ensg_ids, "value" float);
-
 with data_wide as (
     select 
-        try_cast(regexp_extract("filename", '/(\w+)_proteomics', 1) as cancer_ids) as cancer
-        , regexp_extract("filename", 'normalized_(\w+).txt', 1) as cancer_status
+        cast(regexp_extract("filename", '/(\w+)_proteomics', 1) as cancer_ids) as cancer
+        , cast(regexp_extract("filename", 'normalized_(\w+).txt', 1) as disease_ids) as cancer_status
         , * exclude ("filename") 
     from read_csv(
         concat(getenv('DATADIR'), '/cptac-pancancer-data/', getenv('CANCER'), '/', getenv('CANCER'), '_', getenv('DATASET'), '*'),
@@ -29,9 +27,9 @@ insert into cptac_proteomics
 select
     cancer
     , cancer_status
-    -- , cast(sample_id as sample_ids) as sample_id
+    , cast(sample_id as sample_ids) as sample_id
+    -- TODO: Figure out failure source for this ENUM type
     -- , cast(idx as gene_ensg_ids) as gene_ensg
-    , sample_id
     , idx as gene_ensg
-    , try_cast("value" as REAL) as "value"
+    , try_cast("value" as real) as "value"
 from data_long;

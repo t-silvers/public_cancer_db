@@ -4,8 +4,6 @@ set memory_limit = getenv('MEMORY_LIMIT');
 set preserve_insertion_order = false;
 set threads to getenv('NCORES');
 
-drop table if exists gdc_pancan_gistic;
-
 create table gdc_pancan_gistic as
 with data_wide as (
     select 

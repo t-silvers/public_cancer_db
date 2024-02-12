@@ -4,8 +4,6 @@ set memory_limit = getenv('MEMORY_LIMIT');
 set preserve_insertion_order = false;
 set threads to getenv('NCORES');
 
-drop table if exists toil_mc3_v0_2_8_public_toil_xena;
-
 create table toil_mc3_v0_2_8_public_toil_xena as 
 select 
     cast("sample" as sample_ids) as sample_id

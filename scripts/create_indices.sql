@@ -4,13 +4,10 @@ set memory_limit = getenv('MEMORY_LIMIT');
 set preserve_insertion_order = false;
 set threads to getenv('NCORES');
 
--- https://gdc-hub.s3.us-east-1.amazonaws.com/download/gencode.v22.annotation.gene.probeMap
--- https://toil-xena-hub.s3.us-east-1.amazonaws.com/download/probeMap%2Fhugo_gencode_good_hg38_v23comp_probemap
--- https://toil-xena-hub.s3.us-east-1.amazonaws.com/download/probeMap%2Fgencode.v23.annotation.transcript.probemap
-
 drop type if exists assembly_ids;
 drop type if exists cancer_ids;
 drop type if exists chrom_ids;
+drop type if exists disease_ids;
 drop type if exists gene_ensg_ids;
 drop type if exists gene_enst_ids;
 drop type if exists gene_name_ids;
@@ -21,12 +18,12 @@ create type assembly_ids as enum ('hg19', 'hg38');
 create type cancer_ids as enum (
     'ACC', 'BLCA', 'BRCA', 'CESC', 'CHOL',
     'COAD', 'DLBC', 'ESCA', 'GBM', 'HNSC',
-    'KICH', 'KIRC', 'KIRP', 'LAML', 'LIHC',
-    'LUAD', 'LUSC', 'MESO', 'OV', 'PAAD',
-    'PCPG', 'PRAD', 'READ', 'SARC', 'SKCM',
-    'STAD', 'TGCT', 'THCA', 'THYM', 'UCEC',
-    'UCS', 'UVM', 'GDC-PANCAN',
-    'LSCC', 'CCRCC', 'PDAC'
+    'KICH', 'KIRC', 'KIRP', 'LAML', 'LGG', 
+    'LIHC', 'LUAD', 'LUSC', 'MESO', 'OV', 
+    'PAAD', 'PCPG', 'PRAD', 'READ', 'SARC', 
+    'SKCM', 'STAD', 'TGCT', 'THCA', 'THYM', 
+    'UCEC', 'UCS', 'UVM', 'GDC-PANCAN',
+    'CCRCC', 'HNSCC', 'LSCC', 'PDAC'
 );
 
 create type chrom_ids as enum (
@@ -37,6 +34,8 @@ create type chrom_ids as enum (
         select chrom from read_csv(getenv('TOILPROBEMAP'), sep='\t')
     )
 );
+
+create type disease_ids as enum ('Healthy', 'Normal', 'Tumor');
 
 -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 --
@@ -73,7 +72,7 @@ create type gene_name_ids as enum (
 
 create type sample_ids as enum (
     select sample_id from (
-        select case_id as sample_id from read_csv(getenv('CPTACPHENO'), sep='\t', skip=0, header=True, union_by_name=True)
+        select column0 as sample_id from read_csv(getenv('CPTACPHENO'), header=False)
         union
         select "sample" as sample_id from read_csv(getenv('GDCPHENO'), sep='\t')
         union

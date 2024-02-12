@@ -37,6 +37,7 @@ INDEX_DATA := \
 	$(DATA)/toil-xena-hub/mc3.v0.2.8.PUBLIC.toil.xena.gz
 
 DATABASE_TARGETS := \
+	$(DATA)/cptac-pancancer-data/CaseList.done \
 	$(DATA)/cptac-pancancer-data/meta.done \
 	$(DATA)/cptac-pancancer-data/proteomics.done \
 	$(DATA)/cptac-pancancer-data/RNAseq_gene_RSEM_coding.done \

@@ -3,7 +3,7 @@
 ## Description
 
 
-A package to create a DuckDB database for quick querying of publicly available cancer data. Code is in a functional state for use in personal projects. While it works as intended, it includes several quick and dirty implementations.
+Build a DuckDB database for performant querying of publicly available cancer data. Code is in a functional state for use in personal projects. While it works as intended, it includes several quick and dirty implementations.
 
 ## Data Sources
 
@@ -36,3 +36,24 @@ Adding GDC data to an existing database:
 ```bash
 make gdc -C /path/to/public_cancer_db DB="/path/to/data.db"
 ```
+
+### Note on Concurrency
+
+Quoting from the DuckDB docs,
+
+> DuckDB has two configurable options for concurrency:
+> 1. One process can both read and write to the database.
+> 2. Multiple processes can read from the database, but no processes can write (access_mode = 'READ_ONLY').
+> When using option 1, DuckDB supports multiple writer threads ...
+
+To benefit from `make` parallelism, the database can be built in two steps using phony targets,
+
+```bash
+echo "Fetching data ..."
+make fetch_data -C /path/to/public_cancer_db -j 8
+
+echo "Building database ..."
+make make_databases -C /path/to/public_cancer_db -j 1
+```
+
+where `NCORES`, etc. can be configured separately to best utilize available resources for multi-threaded database writes.

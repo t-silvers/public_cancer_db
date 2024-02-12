@@ -6,8 +6,6 @@ set memory_limit = getenv('MEMORY_LIMIT');
 set preserve_insertion_order = false;
 set threads to getenv('NCORES');
 
-drop table if exists gdc_pancan_survival;
-
 create table gdc_pancan_survival as
 select 
     cast("sample" as sample_ids) as sample_id

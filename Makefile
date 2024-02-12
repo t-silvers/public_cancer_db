@@ -60,6 +60,7 @@ $(RAW_DATA):
 make_databases: $(DATA)/create_indices.done database_targets $(CPTAC_HET_SCHEMA_TARGETS)
 
 database_targets: \
+	$(DATA)/cptac-pancancer-data/CaseList.done \
 	$(DATA)/cptac-pancancer-data/meta.done \
 	$(DATA)/cptac-pancancer-data/proteomics.done \
 	$(DATA)/cptac-pancancer-data/RNAseq_gene_RSEM_coding.done \
@@ -154,6 +155,7 @@ $(DATA)/toil-xena-hub/%.done: $(DATA)/toil-xena-hub/%.txt
 cptac: $(filter %cptac-pancancer-data%, $(DATABASE_TARGETS)) $(CPTAC_HET_SCHEMA_TARGETS)
 
 $(DATA)/cptac-pancancer-data/%.done: $(UNZIPPED)
+	export DATADIR="$(DATA)"; \
 	export DATAPATH="$(DATA)/cptac-pancancer-data/*/*_$**"; \
 	export REGEX="/(\w+)_$*"; \
 	$(DUCKDB) $(DB) -bail -c ".read scripts/CPTAC-$*.sql" && \
