@@ -35,6 +35,14 @@ create type chrom_ids as enum (
     )
 );
 
+create type cpg_probe_ids as enum (
+    select probe_id from (
+        select "#id" as probe_id from read_csv(getenv('GDC27MAP'), sep='\t')
+        union
+        select "#id" as probe_id from read_csv(getenv('GDC450MAP'), sep='\t')
+    )
+);
+
 create type disease_ids as enum ('Healthy', 'Normal', 'Tumor');
 
 -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

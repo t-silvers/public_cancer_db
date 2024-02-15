@@ -74,8 +74,26 @@ database_targets: \
 	$(DATA)/gdc-hub/GDC-PANCAN.gistic.done \
 	$(DATA)/gdc-hub/GDC-PANCAN.htseq_fpkm-uq.done \
 	$(DATA)/gdc-hub/GDC-PANCAN.masked_cnv.done \
+	$(DATA)/gdc-hub/GDC-PANCAN.methylation27.done \
+	$(DATA)/gdc-hub/GDC-PANCAN.methylation450.done \
 	$(DATA)/gdc-hub/GDC-PANCAN.mutect2_snv.done \
 	$(DATA)/gdc-hub/gencode.v22.annotation.gene.probeMap.done \
+	$(DATA)/gdc-hub/illuminaMethyl27_hg38_GDC.done \
+	$(DATA)/gdc-hub/illuminaMethyl450_hg38_GDC.done \
+	$(DATA)/icgc-xena-hub/sp%2Fcopy_number_somatic_mutation.all_projects.specimen.done \
+	$(DATA)/icgc-xena-hub/sp%2Fexp_seq.all_projects.specimen.USonly.xena.done \
+	$(DATA)/icgc-xena-hub/sp%2Fprotein_expression.all_projects.specimen.xena.done \
+	$(DATA)/icgc-xena-hub/sp%2FSNV.sp.codingMutation-allProjects.done \
+	$(DATA)/icgc-xena-hub/sp%2Fspecimen.all_projects.done \
+	$(DATA)/pcawg-hub/20170119_final_consensus_copynumber_sp.done \
+	$(DATA)/pcawg-hub/consensus.20170217.purity.ploidy_sp.done \
+	$(DATA)/pcawg-hub/October_2016_all_patients_2778.snv_mnv_indel.maf.coding.xena.done \
+	$(DATA)/pcawg-hub/pcawg_donor_clinical_August2016_v9_sp.done \
+	$(DATA)/pcawg-hub/sp_specimen_type.done \
+	$(DATA)/pcawg-hub/sp_wgs_exclusion_white_gray.done \
+	$(DATA)/pcawg-hub/tophat_star_fpkm_uq.v2_aliquot_gl.sp.log.done
+	$(DATA)/tcga-pancan-atlas-hub/RPPA-pancan-clean.xena.done \
+	$(DATA)/tcga-pancan-atlas-hub/Survival_SupplementalTable_S1_20171025_xena_sp.done \
 	$(DATA)/toil-xena-hub/mc3.v0.2.8.PUBLIC.toil.xena.done \
 	$(DATA)/toil-xena-hub/probeMap%2Fgencode.v23.annotation.transcript.probemap.done \
 	$(DATA)/toil-xena-hub/probeMap%2Fhugo_gencode_good_hg38_v23comp_probemap.done \
@@ -100,8 +118,12 @@ gdc_targets: \
 	$(DATA)/gdc-hub/GDC-PANCAN.gistic.done \
 	$(DATA)/gdc-hub/GDC-PANCAN.htseq_fpkm-uq.done \
 	$(DATA)/gdc-hub/GDC-PANCAN.masked_cnv.done \
+	$(DATA)/gdc-hub/GDC-PANCAN.methylation27.done \
+	$(DATA)/gdc-hub/GDC-PANCAN.methylation450.done \
 	$(DATA)/gdc-hub/GDC-PANCAN.mutect2_snv.done \
-	$(DATA)/gdc-hub/gencode.v22.annotation.gene.probeMap.done
+	$(DATA)/gdc-hub/gencode.v22.annotation.gene.probeMap.done \
+	$(DATA)/gdc-hub/illuminaMethyl27_hg38_GDC.done \
+	$(DATA)/gdc-hub/illuminaMethyl450_hg38_GDC.done
 
 $(DATA)/gdc-hub/%.done: $(DATA)/gdc-hub/%
 	export DATAPATH="$<"; \
@@ -112,6 +134,50 @@ $(DATA)/gdc-hub/%.done: $(DATA)/gdc-hub/%
 $(DATA)/gdc-hub/%.done: $(DATA)/gdc-hub/%.tsv.gz
 	export DATAPATH="$<"; \
 	$(DUCKDB) $(DB) -bail -c ".read scripts/$*.sql" && \
+	rm $< && \
+	touch $@
+
+# ICGC
+
+$(DATA)/icgc-xena-hub/%.done: $(DATA)/icgc-xena-hub/%.gz
+	export DATAPATH="$<"; \
+	$(DUCKDB) $(DB) -bail -c ".read scripts/ICGC-$*.sql" && \
+	rm $< && \
+	touch $@
+
+$(DATA)/icgc-xena-hub/%.done: $(DATA)/icgc-xena-hub/%.tsv.gz
+	export DATAPATH="$<"; \
+	$(DUCKDB) $(DB) -bail -c ".read scripts/ICGC-$*.sql" && \
+	rm $< && \
+	touch $@
+
+# PCAWG
+
+$(DATA)/pcawg-hub/%.done: $(DATA)/pcawg-hub/%
+	export DATAPATH="$<"; \
+	$(DUCKDB) $(DB) -bail -c ".read scripts/PCAWG-$*.sql" && \
+	rm $< && \
+	touch $@
+
+# TCGA
+
+.PHONY: tcga
+
+tcga: $(DATA)/create_indices.done tcga_targets
+
+tcga_targets: \
+	$(DATA)/tcga-pancan-atlas-hub/RPPA-pancan-clean.xena.done \
+	$(DATA)/tcga-pancan-atlas-hub/Survival_SupplementalTable_S1_20171025_xena_sp.done
+
+$(DATA)/tcga-pancan-atlas-hub/%.done: $(DATA)/tcga-pancan-atlas-hub/%
+	export DATAPATH="$<"; \
+	$(DUCKDB) $(DB) -bail -c ".read scripts/TCGA-$*.sql" && \
+	rm $< && \
+	touch $@
+
+$(DATA)/tcga-pancan-atlas-hub/%.done: $(DATA)/tcga-pancan-atlas-hub/%.gz
+	export DATAPATH="$<"; \
+	$(DUCKDB) $(DB) -bail -c ".read scripts/TCGA-$*.sql" && \
 	rm $< && \
 	touch $@
 

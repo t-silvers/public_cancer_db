@@ -39,7 +39,7 @@ make gdc -C /path/to/public_cancer_db DB="/path/to/data.db"
 
 ### Note on Concurrency
 
-Quoting from the DuckDB docs,
+Quoting from the [DuckDB docs on concurrency](https://duckdb.org/docs/connect/concurrency.html),
 
 > DuckDB has two configurable options for concurrency:
 > 1. One process can both read and write to the database.
