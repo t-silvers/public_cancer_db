@@ -89,8 +89,9 @@ DATABASE_TARGETS := \
 	$(DATA)/pcawg-hub/sp_specimen_type.done \
 	$(DATA)/pcawg-hub/sp_wgs_exclusion_white_gray.done \
 	$(DATA)/pcawg-hub/tophat_star_fpkm_uq.v2_aliquot_gl.sp.log.done \
-	$(DATA)/tcga-pancan-atlas-hub/RPPA-pancan-clean.xena.done \
+	$(DATA)/tcga-pancan-atlas-hub/TCGA-RPPA-pancan-clean.xena.done \
 	$(DATA)/tcga-pancan-atlas-hub/Survival_SupplementalTable_S1_20171025_xena_sp.done \
+	$(DATA)/toil-xena-hub/GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.done \
 	$(DATA)/toil-xena-hub/mc3.v0.2.8.PUBLIC.toil.xena.done \
 	$(DATA)/toil-xena-hub/probeMap%2Fgencode.v23.annotation.transcript.probemap.done \
 	$(DATA)/toil-xena-hub/probeMap%2Fhugo_gencode_good_hg38_v23comp_probemap.done \

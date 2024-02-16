@@ -17,7 +17,9 @@ data_long as (
         value 'value'
 )
 select
-    cast(sample_id as sample_ids) as sample_id
-    , cast("Composite Element REF" as cpg_probe_ids) as probe
-    , try_cast("value" as real) as "value"
+    -- try_cast(sample_id as sample_ids) as sample_id
+    -- , try_cast("Composite Element REF" as cpg_probe_ids) as probe
+    sample_id
+    , "Composite Element REF" as probe
+    , cast("value" as real) as "value"
 from data_long;

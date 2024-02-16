@@ -92,8 +92,9 @@ database_targets: \
 	$(DATA)/pcawg-hub/sp_specimen_type.done \
 	$(DATA)/pcawg-hub/sp_wgs_exclusion_white_gray.done \
 	$(DATA)/pcawg-hub/tophat_star_fpkm_uq.v2_aliquot_gl.sp.log.done
-	$(DATA)/tcga-pancan-atlas-hub/RPPA-pancan-clean.xena.done \
+	$(DATA)/tcga-pancan-atlas-hub/TCGA-RPPA-pancan-clean.xena.done \
 	$(DATA)/tcga-pancan-atlas-hub/Survival_SupplementalTable_S1_20171025_xena_sp.done \
+	$(DATA)/toil-xena-hub/GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.done \
 	$(DATA)/toil-xena-hub/mc3.v0.2.8.PUBLIC.toil.xena.done \
 	$(DATA)/toil-xena-hub/probeMap%2Fgencode.v23.annotation.transcript.probemap.done \
 	$(DATA)/toil-xena-hub/probeMap%2Fhugo_gencode_good_hg38_v23comp_probemap.done \
@@ -166,7 +167,7 @@ $(DATA)/pcawg-hub/%.done: $(DATA)/pcawg-hub/%
 tcga: $(DATA)/create_indices.done tcga_targets
 
 tcga_targets: \
-	$(DATA)/tcga-pancan-atlas-hub/RPPA-pancan-clean.xena.done \
+	$(DATA)/tcga-pancan-atlas-hub/TCGA-RPPA-pancan-clean.xena.done \
 	$(DATA)/tcga-pancan-atlas-hub/Survival_SupplementalTable_S1_20171025_xena_sp.done
 
 $(DATA)/tcga-pancan-atlas-hub/%.done: $(DATA)/tcga-pancan-atlas-hub/%
@@ -188,6 +189,7 @@ $(DATA)/tcga-pancan-atlas-hub/%.done: $(DATA)/tcga-pancan-atlas-hub/%.gz
 toil: $(DATA)/create_indices.done toil_targets
 
 toil_targets: \
+	$(DATA)/toil-xena-hub/GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.done \
 	$(DATA)/toil-xena-hub/mc3.v0.2.8.PUBLIC.toil.xena.done \
 	$(DATA)/toil-xena-hub/probeMap%2Fgencode.v23.annotation.transcript.probemap.done \
 	$(DATA)/toil-xena-hub/probeMap%2Fhugo_gencode_good_hg38_v23comp_probemap.done \
@@ -212,6 +214,15 @@ $(DATA)/toil-xena-hub/%.done: $(DATA)/toil-xena-hub/%.txt
 	export DATAPATH="$<"; \
 	$(DUCKDB) $(DB) -bail -c ".read scripts/Toil-$*.sql" && \
 	rm $< && \
+	touch $@
+
+# GTEx age
+
+# From https://gtexportal.org/home/downloads/adult-gtex/metadata
+
+$(DATA)/toil-xena-hub/GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.done:
+	export DATAPATH="https://storage.googleapis.com/adult-gtex/annotations/v8/metadata-files/GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.txt"; \
+	$(DUCKDB) $(DB) -bail -c ".read scripts/Toil-GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.sql" && \
 	touch $@
 
 # CPTAC

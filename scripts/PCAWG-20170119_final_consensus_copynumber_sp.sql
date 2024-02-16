@@ -17,7 +17,7 @@ select
         when star = '1' then 'best_method'
         else null
     end as star_eval
-from read_csv(getenv('DATAPATH'), sep='\t');
+from read_csv(getenv('DATAPATH'), nullstr='NA', sep='\t');
 
 alter table pcawg_20170119_final_consensus_copynumber_sp
 add column "assembly" assembly_ids default 'hg19';

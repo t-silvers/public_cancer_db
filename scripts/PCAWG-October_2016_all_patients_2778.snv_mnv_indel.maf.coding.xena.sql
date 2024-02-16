@@ -12,8 +12,8 @@ select
     , cast("end" as ubigint) as chrom_end
     , gene as gene_name
     , effect
-    , cast(DNA_VAF as real) as dna_vaf
-from read_csv(getenv('DATAPATH'), sep='\t');
+    , try_cast(DNA_VAF as real) as dna_vaf
+from read_csv(getenv('DATAPATH'), nullstr='NA', sep='\t');
 
 alter table pcawg_october_2016_all_patients_2778_snv_mnv_indel_maf_coding_xena
 add column "assembly" assembly_ids default 'hg19';
