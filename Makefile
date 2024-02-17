@@ -9,248 +9,77 @@
 # - clean: Removes all generated files.
 #
 # Usage example:
-#   make DATA="/path/to/results" MEMORY_LIMIT=8GB NCORES=4 DOWNLOADER=aria2
+#   make DIR="/path/to/results" MEMORY_LIMIT=8GB NCORES=4 DOWNLOADER=aria2
 #
-# See config.mk for further details on configurables.
+# See cfg.mk for further details on configurables.
 
 #
 # Configuration
 #
 include config/cfg.mk
-include config/urls.mk
 
 MAKEFLAGS += --warn-undefined-variables
 .SHELLFLAGS := -eu -o pipefail -c
 .DEFAULT_GOAL := all
-.DELETE_ON_ERROR:
 
-# 
-# Fetch data
-#
+data_dir := $(DIR)/data
+temp_dir := $(DIR)/temp
 
-define url_to_path
-$(shell echo $(1) | sed -E 's|https://([^.]*)\.s3\..*\.amazonaws\.com/(download/)?(.*/)?([^/]*)$$|$(DATA)/\1/\4|')
-endef
-
-RAW_DATA := $(foreach url,$(URLS),$(call url_to_path,$(url)))
-UNZIPPED := $(basename $(filter %.zip,$(RAW_DATA)))
+tbl_names := $(shell awk -F, 'NR>1 {print $$1}' $(CURDIR)/config/test_data.csv | sort | uniq)
+urls := $(shell awk -F, 'NR>1 {print $$2}' $(CURDIR)/config/test_data.csv | sort | uniq)
 
 .PHONY: all clean
 
-all: fetch_data make_databases
+all: directories fetch unzip ingest
 
-.PHONY: fetch_data
+directories:
+	@mkdir -p $(data_dir) $(temp_dir)
 
-fetch_data: $(RAW_DATA) $(UNZIPPED)
-
-$(RAW_DATA):
-	$(eval URL=$(filter %$(notdir $@), $(URLS)))
-	@mkdir -p $(dir $@)
-	$(call get_download_cmd,$(DOWNLOADER))
-
-%: %.zip
-	$(UNZIP) -qq $< -d $(dir $<) && touch $@
-
-# 
-# Create database(s) with real data
+#
+# Fetch data from remotes
 #
 
-.PHONY: make_databases
+raw_data := $(addprefix $(data_dir)/,$(notdir $(urls)))
 
-make_databases: $(DATA)/create_indices.done database_targets $(CPTAC_HET_SCHEMA_TARGETS)
+.PHONY: fetch unzip
+.INTERMEDIATE: $(raw_data)
+fetch: $(raw_data)
 
-database_targets: \
-	$(DATA)/cptac-pancancer-data/CaseList.done \
-	$(DATA)/cptac-pancancer-data/meta.done \
-	$(DATA)/cptac-pancancer-data/proteomics.done \
-	$(DATA)/cptac-pancancer-data/RNAseq_gene_RSEM_coding.done \
-	$(DATA)/cptac-pancancer-data/RNAseq_isoform.done \
-	$(DATA)/cptac-pancancer-data/somatic_mutation.maf.done \
-	$(DATA)/cptac-pancancer-data/survival.done \
-	$(DATA)/cptac-pancancer-data/WES_CNV_gene_gistic.done \
-	$(DATA)/cptac-pancancer-data/WES_CNV_gene_ratio.done \
-	$(DATA)/gdc-hub/GDC-PANCAN.basic_phenotype.done \
-	$(DATA)/gdc-hub/GDC-PANCAN.cnv.done \
-	$(DATA)/gdc-hub/GDC-PANCAN.gistic.done \
-	$(DATA)/gdc-hub/GDC-PANCAN.htseq_fpkm-uq.done \
-	$(DATA)/gdc-hub/GDC-PANCAN.masked_cnv.done \
-	$(DATA)/gdc-hub/GDC-PANCAN.methylation27.done \
-	$(DATA)/gdc-hub/GDC-PANCAN.methylation450.done \
-	$(DATA)/gdc-hub/GDC-PANCAN.mutect2_snv.done \
-	$(DATA)/gdc-hub/gencode.v22.annotation.gene.probeMap.done \
-	$(DATA)/gdc-hub/illuminaMethyl27_hg38_GDC.done \
-	$(DATA)/gdc-hub/illuminaMethyl450_hg38_GDC.done \
-	$(DATA)/icgc-xena-hub/sp%2Fcopy_number_somatic_mutation.all_projects.specimen.done \
-	$(DATA)/icgc-xena-hub/sp%2Fexp_seq.all_projects.specimen.USonly.xena.done \
-	$(DATA)/icgc-xena-hub/sp%2Fprotein_expression.all_projects.specimen.xena.done \
-	$(DATA)/icgc-xena-hub/sp%2FSNV.sp.codingMutation-allProjects.done \
-	$(DATA)/icgc-xena-hub/sp%2Fspecimen.all_projects.done \
-	$(DATA)/pcawg-hub/20170119_final_consensus_copynumber_sp.done \
-	$(DATA)/pcawg-hub/consensus.20170217.purity.ploidy_sp.done \
-	$(DATA)/pcawg-hub/October_2016_all_patients_2778.snv_mnv_indel.maf.coding.xena.done \
-	$(DATA)/pcawg-hub/pcawg_donor_clinical_August2016_v9_sp.done \
-	$(DATA)/pcawg-hub/sp_specimen_type.done \
-	$(DATA)/pcawg-hub/sp_wgs_exclusion_white_gray.done \
-	$(DATA)/pcawg-hub/tophat_star_fpkm_uq.v2_aliquot_gl.sp.log.done
-	$(DATA)/tcga-pancan-atlas-hub/TCGA-RPPA-pancan-clean.xena.done \
-	$(DATA)/tcga-pancan-atlas-hub/Survival_SupplementalTable_S1_20171025_xena_sp.done \
-	$(DATA)/toil-xena-hub/GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.done \
-	$(DATA)/toil-xena-hub/mc3.v0.2.8.PUBLIC.toil.xena.done \
-	$(DATA)/toil-xena-hub/probeMap%2Fgencode.v23.annotation.transcript.probemap.done \
-	$(DATA)/toil-xena-hub/probeMap%2Fhugo_gencode_good_hg38_v23comp_probemap.done \
-	$(DATA)/toil-xena-hub/TCGA_GTEX_category.done \
-	$(DATA)/toil-xena-hub/TcgaTargetGtex_RSEM_Hugo_norm_count.done \
-	$(DATA)/toil-xena-hub/TcgaTargetGtex_RSEM_isoform_fpkm.done \
-	$(DATA)/toil-xena-hub/TcgaTargetGtex_rsem_isoform_tpm.done
+unzip: $(filter %.zip,$(raw_data))
+	$(foreach zip,$^,unzip -qq $(zip) -d $(data_dir);)
 
-$(DATA)/create_indices.done: $(INDEX_DATA) $(UNZIPPED)
-	$(SHELL) scripts/create_indices.sh $(DATA) $(DUCKDB) $(DB) $(abspath scripts/create_indices.sql) \
-	&& touch $@
+$(data_dir)/%:
+	$(ARIA2) --check-certificate=false -s4 -x16 -k1M -d $(data_dir) -o $(notdir $@) $(filter %$*, $(urls))
 
-# GDC
+#
+# Ingest data to database
+#
 
-.PHONY: gdc
+db_targets := $(addsuffix .done, $(addprefix $(temp_dir)/,$(tbl_names)))
 
-gdc: $(DATA)/create_indices.done gdc_targets
+.PHONY: create_index ingest
+.INTERMEDIATE: $(db_targets)
+ingest: create_index $(db_targets)
 
-gdc_targets: \
-	$(DATA)/gdc-hub/GDC-PANCAN.basic_phenotype.done \
-	$(DATA)/gdc-hub/GDC-PANCAN.cnv.done \
-	$(DATA)/gdc-hub/GDC-PANCAN.gistic.done \
-	$(DATA)/gdc-hub/GDC-PANCAN.htseq_fpkm-uq.done \
-	$(DATA)/gdc-hub/GDC-PANCAN.masked_cnv.done \
-	$(DATA)/gdc-hub/GDC-PANCAN.methylation27.done \
-	$(DATA)/gdc-hub/GDC-PANCAN.methylation450.done \
-	$(DATA)/gdc-hub/GDC-PANCAN.mutect2_snv.done \
-	$(DATA)/gdc-hub/gencode.v22.annotation.gene.probeMap.done \
-	$(DATA)/gdc-hub/illuminaMethyl27_hg38_GDC.done \
-	$(DATA)/gdc-hub/illuminaMethyl450_hg38_GDC.done
+create_index:
+	$(DUCKDB) $(DB) -bail -c ".read scripts/create_index.sql"
 
-$(DATA)/gdc-hub/%.done: $(DATA)/gdc-hub/%
-	export DATAPATH="$<"; \
+# $(temp_dir)/%.done:
+# 	$(DUCKDB) $(DB) -bail -c ".read scripts/$*.sql" && touch $@
+
+het_schema_aliases := cptac_cnv cptac_exp_coding cptac_exp_isoform cptac_gistic cptac_prot
+
+$(temp_dir)/%.done:
 	$(DUCKDB) $(DB) -bail -c ".read scripts/$*.sql" && \
-	rm $< && \
-	touch $@
-
-$(DATA)/gdc-hub/%.done: $(DATA)/gdc-hub/%.tsv.gz
-	export DATAPATH="$<"; \
-	$(DUCKDB) $(DB) -bail -c ".read scripts/$*.sql" && \
-	rm $< && \
-	touch $@
-
-# ICGC
-
-$(DATA)/icgc-xena-hub/%.done: $(DATA)/icgc-xena-hub/%.gz
-	export DATAPATH="$<"; \
-	$(DUCKDB) $(DB) -bail -c ".read scripts/ICGC-$*.sql" && \
-	rm $< && \
-	touch $@
-
-$(DATA)/icgc-xena-hub/%.done: $(DATA)/icgc-xena-hub/%.tsv.gz
-	export DATAPATH="$<"; \
-	$(DUCKDB) $(DB) -bail -c ".read scripts/ICGC-$*.sql" && \
-	rm $< && \
-	touch $@
-
-# PCAWG
-
-$(DATA)/pcawg-hub/%.done: $(DATA)/pcawg-hub/%
-	export DATAPATH="$<"; \
-	$(DUCKDB) $(DB) -bail -c ".read scripts/PCAWG-$*.sql" && \
-	rm $< && \
-	touch $@
-
-# TCGA
-
-.PHONY: tcga
-
-tcga: $(DATA)/create_indices.done tcga_targets
-
-tcga_targets: \
-	$(DATA)/tcga-pancan-atlas-hub/TCGA-RPPA-pancan-clean.xena.done \
-	$(DATA)/tcga-pancan-atlas-hub/Survival_SupplementalTable_S1_20171025_xena_sp.done
-
-$(DATA)/tcga-pancan-atlas-hub/%.done: $(DATA)/tcga-pancan-atlas-hub/%
-	export DATAPATH="$<"; \
-	$(DUCKDB) $(DB) -bail -c ".read scripts/TCGA-$*.sql" && \
-	rm $< && \
-	touch $@
-
-$(DATA)/tcga-pancan-atlas-hub/%.done: $(DATA)/tcga-pancan-atlas-hub/%.gz
-	export DATAPATH="$<"; \
-	$(DUCKDB) $(DB) -bail -c ".read scripts/TCGA-$*.sql" && \
-	rm $< && \
-	touch $@
-
-# Toil
-
-.PHONY: toil
-
-toil: $(DATA)/create_indices.done toil_targets
-
-toil_targets: \
-	$(DATA)/toil-xena-hub/GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.done \
-	$(DATA)/toil-xena-hub/mc3.v0.2.8.PUBLIC.toil.xena.done \
-	$(DATA)/toil-xena-hub/probeMap%2Fgencode.v23.annotation.transcript.probemap.done \
-	$(DATA)/toil-xena-hub/probeMap%2Fhugo_gencode_good_hg38_v23comp_probemap.done \
-	$(DATA)/toil-xena-hub/TCGA_GTEX_category.done \
-	$(DATA)/toil-xena-hub/TcgaTargetGtex_RSEM_Hugo_norm_count.done \
-	$(DATA)/toil-xena-hub/TcgaTargetGtex_RSEM_isoform_fpkm.done \
-	$(DATA)/toil-xena-hub/TcgaTargetGtex_rsem_isoform_tpm.done
-
-$(DATA)/toil-xena-hub/%.done: $(DATA)/toil-xena-hub/%
-	export DATAPATH="$<"; \
-	$(DUCKDB) $(DB) -bail -c ".read scripts/Toil-$*.sql" && \
-	rm $< && \
-	touch $@
-
-$(DATA)/toil-xena-hub/%.done: $(DATA)/toil-xena-hub/%.gz
-	export DATAPATH="$<"; \
-	$(DUCKDB) $(DB) -bail -c ".read scripts/Toil-$*.sql" && \
-	rm $< && \
-	touch $@
-
-$(DATA)/toil-xena-hub/%.done: $(DATA)/toil-xena-hub/%.txt
-	export DATAPATH="$<"; \
-	$(DUCKDB) $(DB) -bail -c ".read scripts/Toil-$*.sql" && \
-	rm $< && \
-	touch $@
-
-# GTEx age
-
-# From https://gtexportal.org/home/downloads/adult-gtex/metadata
-
-$(DATA)/toil-xena-hub/GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.done:
-	export DATAPATH="https://storage.googleapis.com/adult-gtex/annotations/v8/metadata-files/GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.txt"; \
-	$(DUCKDB) $(DB) -bail -c ".read scripts/Toil-GTEx_Analysis_v8_Annotations_SubjectPhenotypesDS.sql" && \
-	touch $@
-
-# CPTAC
-
-.PHONY: cptac
-
-cptac: $(filter %cptac-pancancer-data%, $(DATABASE_TARGETS)) $(CPTAC_HET_SCHEMA_TARGETS)
-
-$(DATA)/cptac-pancancer-data/%.done: $(UNZIPPED)
-	export DATADIR="$(DATA)"; \
-	export DATAPATH="$(DATA)/cptac-pancancer-data/*/*_$**"; \
-	export REGEX="/(\w+)_$*"; \
-	$(DUCKDB) $(DB) -bail -c ".read scripts/CPTAC-$*.sql" && \
-	touch $@
-
-# CPTAC data with heterogenous schema
-$(DATA)/cptac-pancancer-data/%.hetschema: $(DATA)/cptac-pancancer-data/%.done
-	@for cancer in BRCA CCRCC COAD GBM HNSCC LSCC LUAD OV PDAC UCEC; do \
-		export DATADIR="$(DATA)"; \
-		export CANCER="$$cancer"; \
-		export DATASET="$*"; \
-		$(DUCKDB) $(DB) -bail -c ".read scripts/CPTAC-$*-hetschema.sql"; \
-	done && \
+	@if echo "$(het_schema_aliases)" | grep -wq "$*"; \
+	then \
+	  @for cancer in BRCA CCRCC COAD GBM HNSCC LSCC LUAD OV PDAC UCEC; \
+	  do \
+	    export CANCER="$$cancer"; \
+		$(DUCKDB) $(DB) -bail -c ".read scripts/$*-hs.sql"; \
+	  done; \
+	fi && \
 	touch $@
 
 clean:
-	@echo "Cleaning up"
-	@rm -rf $(RAW_DATA)
-	@rm -rf $(UNZIPPED)
-	@rm -f $(DATABASE_TARGETS)
-	@rm -f $(CPTAC_HET_SCHEMA_TARGETS)
+	@rm -rf $(data_dir) $(temp_dir)
