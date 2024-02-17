@@ -26,7 +26,8 @@ insert into cptac_gistic
 select
     cancer
     , cast(sample_id as sample_ids) as sample_id
+    -- TODO: Remove .# suffix from ENSGs
     -- , cast(idx as gene_ensg_ids) as gene_ensg
     , idx as gene_ensg
-    , try_cast("value" as real) as "value"
+    , cast("value" + 2 as uint8) as "value"
 from data_long;

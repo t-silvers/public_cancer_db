@@ -25,12 +25,28 @@ MAKEFLAGS += --warn-undefined-variables
 data_dir := $(DIR)/data
 temp_dir := $(DIR)/temp
 
-tbl_names := $(shell awk -F, 'NR>1 {print $$1}' $(CURDIR)/config/data.csv | sort | uniq)
-urls := $(shell awk -F, 'NR>1 {print $$2}' $(CURDIR)/config/data.csv | sort | uniq)
+data_config ?= config/data.csv
+
+tbl_names := $(shell awk -F, 'NR>1 {print $$1}' $(data_config) | sort | uniq)
+urls := $(shell awk -F, 'NR>1 {print $$2}' $(data_config) | sort | uniq)
 
 .PHONY: all clean
 
-all: directories fetch unzip ingest
+all: check_params directories fetch unzip ingest
+
+.PHONY: check_params directories
+
+check_params:
+	@echo "MEMORY_LIMIT = $(MEMORY_LIMIT)"
+	@echo "NCORES = $(NCORES)"
+	@echo "DIR = $(DIR)"
+	@echo "DB = $(DB)"
+	@echo "ARIA2 = $(ARIA2)"
+	@echo "DUCKDB = $(DUCKDB)"
+	@echo "DOWNLOADER = $(DOWNLOADER)"
+	@echo "data_dir = $(data_dir)"
+	@echo "temp_dir = $(temp_dir)"
+	@echo "data_config = $(data_config)"
 
 directories:
 	@mkdir -p $(data_dir) $(temp_dir)
@@ -42,9 +58,11 @@ directories:
 raw_data := $(addprefix $(data_dir)/,$(notdir $(urls)))
 
 .PHONY: fetch unzip
-fetch: $(raw_data)
+
+fetch: directories $(raw_data) unzip
 
 unzip: $(filter %.zip,$(raw_data))
+	@echo Unzipping $^ ...
 	@$(foreach zip,$^,unzip -qq $(zip) -d $(data_dir);)
 
 $(data_dir)/%:
@@ -58,8 +76,10 @@ $(data_dir)/%:
 db_targets := $(addsuffix .done, $(addprefix $(temp_dir)/,$(tbl_names)))
 
 .PHONY: create_index ingest
+
 .INTERMEDIATE: $(db_targets)
-ingest: create_index $(db_targets)
+
+ingest: directories create_index $(db_targets)
 
 create_index:
 	@echo Create data indices ...

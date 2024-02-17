@@ -9,7 +9,9 @@ with data_wide as (
     select *
     from read_csv(
         concat(getenv('DIR'), '/data/GDC-PANCAN.methylation27.tsv.gz'),
-        sep='\t', sample_size = 1280, parallel = True
+        sep='\t',
+        sample_size=1280,
+        -- parallel=True
     )
 ),
 data_long as (

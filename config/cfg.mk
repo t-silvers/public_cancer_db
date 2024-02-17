@@ -9,8 +9,12 @@ NCORES ?= 2
 export MEMORY_LIMIT
 export NCORES
 
+# # TODO: separating source and binary
+# MK_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+# CONFIG_FILE := $(MK_DIR)config/cfg.mk
+
 # Data directory, if not relative to the Makefile.
-DIR ?= $(CURDIR)/results
+DIR ?= results
 
 # Database file, if exists already or not in the data directory.
 DB ?= $(DIR)/public_cancer_data.duckdb
@@ -30,8 +34,8 @@ WGET ?= wget
 # Configuration for downloader via DOWNLOADER var. Should be overridden.
 DOWNLOADER ?= wget # or aria2
 
-# TODO: Set -s and -x based on NCORES
 
+# TODO: Set -s and -x based on NCORES
 # Configuration for downloading data files
 
 
