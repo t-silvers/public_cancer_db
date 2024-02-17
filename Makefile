@@ -25,8 +25,8 @@ MAKEFLAGS += --warn-undefined-variables
 data_dir := $(DIR)/data
 temp_dir := $(DIR)/temp
 
-tbl_names := $(shell awk -F, 'NR>1 {print $$1}' $(CURDIR)/config/test_data.csv | sort | uniq)
-urls := $(shell awk -F, 'NR>1 {print $$2}' $(CURDIR)/config/test_data.csv | sort | uniq)
+tbl_names := $(shell awk -F, 'NR>1 {print $$1}' $(CURDIR)/config/data.csv | sort | uniq)
+urls := $(shell awk -F, 'NR>1 {print $$2}' $(CURDIR)/config/data.csv | sort | uniq)
 
 .PHONY: all clean
 
@@ -46,10 +46,11 @@ raw_data := $(addprefix $(data_dir)/,$(notdir $(urls)))
 fetch: $(raw_data)
 
 unzip: $(filter %.zip,$(raw_data))
-	$(foreach zip,$^,unzip -qq $(zip) -d $(data_dir);)
+	@$(foreach zip,$^,unzip -qq $(zip) -d $(data_dir);)
 
 $(data_dir)/%:
-	$(ARIA2) --check-certificate=false -s4 -x16 -k1M -d $(data_dir) -o $(notdir $@) $(filter %$*, $(urls))
+	@echo Fetching data from $(filter %$*, $(urls)) ...
+	@$(ARIA2) --check-certificate=false -s4 -x16 -k1M -d $(data_dir) -o $(notdir $@) $(filter %$*, $(urls))
 
 #
 # Ingest data to database
@@ -62,23 +63,23 @@ db_targets := $(addsuffix .done, $(addprefix $(temp_dir)/,$(tbl_names)))
 ingest: create_index $(db_targets)
 
 create_index:
-	$(DUCKDB) $(DB) -bail -c ".read scripts/create_index.sql"
+	@echo Create data indices ...
+	@$(DUCKDB) $(DB) -bail -c ".read scripts/create_index.sql"
 
-# $(temp_dir)/%.done:
-# 	$(DUCKDB) $(DB) -bail -c ".read scripts/$*.sql" && touch $@
-
+# CPTAC data sets with heterogeneous schema across cancers
 het_schema_aliases := cptac_cnv cptac_exp_coding cptac_exp_isoform cptac_gistic cptac_prot
 
 $(temp_dir)/%.done:
-	$(DUCKDB) $(DB) -bail -c ".read scripts/$*.sql" && \
-	@if echo "$(het_schema_aliases)" | grep -wq "$*"; \
-	then \
-	  @for cancer in BRCA CCRCC COAD GBM HNSCC LSCC LUAD OV PDAC UCEC; \
-	  do \
-	    export CANCER="$$cancer"; \
-		$(DUCKDB) $(DB) -bail -c ".read scripts/$*-hs.sql"; \
-	  done; \
-	fi && \
+	@echo Ingesting $* ...
+	@$(DUCKDB) $(DB) -bail -c ".read scripts/$*.sql" && \
+	{ \
+		if echo "$(het_schema_aliases)" | grep -wq "$*"; then \
+			for cancer in BRCA CCRCC COAD GBM HNSCC LSCC LUAD OV PDAC UCEC; do \
+				export CANCER="$$cancer"; \
+				$(DUCKDB) $(DB) -bail -c ".read scripts/$*-hs.sql"; \
+			done; \
+		fi; \
+	} && \
 	touch $@
 
 clean:

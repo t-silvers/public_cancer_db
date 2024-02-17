@@ -10,7 +10,7 @@ with data_wide as (
         , cast(regexp_extract("filename", 'log2_(\w+).txt', 1) as disease_ids) as cancer_status
         , * exclude ("filename") 
     from read_csv(
-        concat(getenv('DIR'), getenv('CANCER'), '/', getenv('CANCER'), '_RNAseq_gene_RSEM_coding_UQ_1500_log2_*'),
+        concat(getenv('DIR'), '/data/', getenv('CANCER'), '/', getenv('CANCER'), '_RNAseq_gene_RSEM_coding_UQ_1500_log2_*'),
         sep='\t',
         header=True,
         filename=True

@@ -28,7 +28,7 @@ make -C /path/to/public_cancer_db
 With custom configuration:
 
 ```bash
-make -C /path/to/public_cancer_db DATA="/path/to/large_data_storage" MEMORY_LIMIT=32GB NCORES=16 DOWNLOADER=aria2
+make -C /path/to/public_cancer_db DIR="/path/to/large_data_storage" MEMORY_LIMIT=32GB NCORES=16 DOWNLOADER=aria2
 ```
 
 Adding GDC data to an existing database:
@@ -50,10 +50,10 @@ To benefit from `make` parallelism, the database can be built in two steps using
 
 ```bash
 echo "Fetching data ..."
-make fetch_data -C /path/to/public_cancer_db -j 8
+make fetch -C /path/to/public_cancer_db -j 8
 
 echo "Building database ..."
-make make_databases -C /path/to/public_cancer_db -j 1
+make ingest -C /path/to/public_cancer_db -j 1
 ```
 
 where `NCORES`, etc. can be configured separately to best utilize available resources for multi-threaded database writes.
