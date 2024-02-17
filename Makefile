@@ -42,7 +42,6 @@ directories:
 raw_data := $(addprefix $(data_dir)/,$(notdir $(urls)))
 
 .PHONY: fetch unzip
-.INTERMEDIATE: $(raw_data)
 fetch: $(raw_data)
 
 unzip: $(filter %.zip,$(raw_data))
@@ -50,7 +49,7 @@ unzip: $(filter %.zip,$(raw_data))
 
 $(data_dir)/%:
 	@echo Fetching data from $(filter %$*, $(urls)) ...
-	@$(ARIA2) --check-certificate=false -s4 -x16 -k1M -d $(data_dir) -o $(notdir $@) $(filter %$*, $(urls))
+	@$(ARIA2) --quiet --check-certificate=false -s4 -x16 -k1M -d $(data_dir) -o $(notdir $@) $(filter %$*, $(urls))
 
 #
 # Ingest data to database
