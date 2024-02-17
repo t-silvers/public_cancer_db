@@ -1,0 +1,1 @@
+create table cptac_pheno (sample_id sample_ids);

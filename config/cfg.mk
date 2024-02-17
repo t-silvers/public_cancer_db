@@ -10,10 +10,10 @@ export MEMORY_LIMIT
 export NCORES
 
 # Data directory, if not relative to the Makefile.
-DATA ?= data
+DIR ?= $(CURDIR)/results
 
 # Database file, if exists already or not in the data directory.
-DB ?= $(DATA)/data.duckdb
+DB ?= $(DIR)/public_cancer_data.duckdb
 
 #
 # Configuration
@@ -33,10 +33,17 @@ DOWNLOADER ?= wget # or aria2
 # TODO: Set -s and -x based on NCORES
 
 # Configuration for downloading data files
-define get_download_cmd
-$(if $(filter $(1),wget),\
-$(WGET) -O $@ $(URL),\
-$(if $(filter $(1),aria2),\
-$(ARIA2) --check-certificate=false -s4 -x16 -k1M -d $(shell echo $(dir $@) | sed 's/\/$$//') -o $(notdir $@) $(URL),\
-echo "Unsupported downloader: $(1)"))
-endef
+
+
+# $(data_dir)/%:
+# 	# @wget -O $@ $(filter %$*, $(urls))
+# 	$(ARIA2) --check-certificate=false -s4 -x16 -k1M -d $(data_dir) -o $(notdir $@) $(filter %$*, $(urls))
+
+
+# define get_download_cmd
+# $(if $(filter $(1),wget),\
+# $(WGET) -O $@ $(URL),\
+# $(if $(filter $(1),aria2),\
+# $(ARIA2) --check-certificate=false -s4 -x16 -k1M -d $(shell echo $(dir $@) | sed 's/\/$$//') -o $(notdir $@) $(URL),\
+# echo "Unsupported downloader: $(1)"))
+# endef
