@@ -10,10 +10,10 @@ with data_wide as (
         "sample" as gene_name
         , * exclude ("sample") 
     from read_csv(
-        concat(getenv('DIR'), '/data/sp%2Fexp_seq.all_projects.specimen.USonly.xena.tsv.gz'),
+        concat(getenv('data_dir'), '/sp%2Fexp_seq.all_projects.specimen.USonly.xena.tsv.gz'),
         sep='\t',
-        sample_size=1280,
-        parallel=True
+        parallel=True,
+        sample_size=1280
     )
 ),
 data_long as (

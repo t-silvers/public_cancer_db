@@ -9,7 +9,13 @@ with data_wide as (
     select 
         xena_sample as gene_ensg
         , * exclude (xena_sample) 
-    from read_csv(concat(getenv('DIR'), '/data/GDC-PANCAN.htseq_fpkm-uq.tsv.gz'), sep='\t', nullstr='nan', sample_size=1280, parallel=True)
+    from read_csv(
+        concat(getenv('data_dir'), '/GDC-PANCAN.htseq_fpkm-uq.tsv.gz'),
+        sep='\t',
+        nullstr='nan',
+        parallel=True,
+        sample_size=1280
+    )
 ),
 data_long as (
     unpivot data_wide

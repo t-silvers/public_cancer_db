@@ -10,10 +10,10 @@ with data_wide as (
         "sample" as gene_enst
         , * exclude ("sample")
     from read_csv(
-        concat(getenv('DIR'), '/data/TcgaTargetGtex_rsem_isoform_tpm.gz'),
+        concat(getenv('data_dir'), '/TcgaTargetGtex_rsem_isoform_tpm.gz'),
         sep='\t',
-        sample_size=1280,
-        parallel=True
+        parallel=True,
+        sample_size=1280
     ) 
 ),
 data_long as (

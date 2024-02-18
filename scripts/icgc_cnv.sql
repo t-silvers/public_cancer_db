@@ -12,8 +12,10 @@ select
     , cast("end" as ubigint) as chrom_end
     , cast("value" as real) as "value"
 from read_csv(
-    concat(getenv('DIR'), '/data/sp%2Fcopy_number_somatic_mutation.all_projects.specimen.gz'),
-    sep='\t'
+    concat(getenv('data_dir'), '/sp%2Fcopy_number_somatic_mutation.all_projects.specimen.gz'),
+    sep='\t',
+    parallel=True,
+    sample_size=1280
 );
 
 alter table icgc_cnv

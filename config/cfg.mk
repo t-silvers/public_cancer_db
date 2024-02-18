@@ -19,6 +19,16 @@ DIR ?= results
 # Database file, if exists already or not in the data directory.
 DB ?= $(DIR)/public_cancer_data.duckdb
 
+data_dir ?= $(DIR)/data
+export data_dir
+
+temp_dir ?= $(DIR)/temp
+
+data_config ?= config/data.csv
+
+tbl_names := $(shell awk -F, 'NR>1 {print $$1}' $(data_config) | sort | uniq)
+urls := $(shell awk -F, 'NR>1 {print $$2}' $(data_config) | sort | uniq)
+
 #
 # Configuration
 #

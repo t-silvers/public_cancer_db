@@ -22,14 +22,6 @@ MAKEFLAGS += --warn-undefined-variables
 .SHELLFLAGS := -eu -o pipefail -c
 .DEFAULT_GOAL := all
 
-data_dir := $(DIR)/data
-temp_dir := $(DIR)/temp
-
-data_config ?= config/data.csv
-
-tbl_names := $(shell awk -F, 'NR>1 {print $$1}' $(data_config) | sort | uniq)
-urls := $(shell awk -F, 'NR>1 {print $$2}' $(data_config) | sort | uniq)
-
 .PHONY: all clean
 
 all: check_params directories fetch unzip ingest
@@ -77,7 +69,13 @@ db_targets := $(addsuffix .done, $(addprefix $(temp_dir)/,$(tbl_names)))
 
 .PHONY: create_index ingest
 
-.INTERMEDIATE: $(db_targets)
+# .INTERMEDIATE: $(db_targets)
+
+# TODO: Allow multiple makes to populate database when errors encountered.
+# 		Could also use `CREATE IF NOT EXISTS` in SQL, but will fail for CPTAC,
+# 		where table creation and insertion is separate.
+
+.IGNORE: $(db_targets)
 
 ingest: directories create_index $(db_targets)
 

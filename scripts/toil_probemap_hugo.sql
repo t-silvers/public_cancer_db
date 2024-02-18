@@ -13,6 +13,6 @@ select
     , cast(chromStart as UBIGINT) as chrom_start
     , cast(chromEnd as UBIGINT) as chrom_end
 from read_csv(
-    concat(getenv('DIR'), '/data/probeMap%2Fhugo_gencode_good_hg38_v23comp_probemap'),
+    concat(getenv('data_dir'), '/probeMap%2Fhugo_gencode_good_hg38_v23comp_probemap'),
     sep='\t'
 );

@@ -14,7 +14,7 @@ select
     , effect
     , try_cast(DNA_VAF as real) as dna_vaf
 from read_csv(
-    concat(getenv('DIR'), '/data/October_2016_all_patients_2778.snv_mnv_indel.maf.coding.xena'),
+    concat(getenv('data_dir'), '/October_2016_all_patients_2778.snv_mnv_indel.maf.coding.xena'),
     nullstr='NA',
     sep='\t'
 );

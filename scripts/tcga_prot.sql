@@ -10,10 +10,9 @@ with data_wide as (
         SampleID as gene_ensg
         , * exclude (SampleID) 
     from read_csv(
-        concat(getenv('DIR'), '/data/TCGA-RPPA-pancan-clean.xena.gz'),
+        concat(getenv('data_dir'), '/TCGA-RPPA-pancan-clean.xena.gz'),
         sep='\t',
         sample_size=1280,
-        parallel=True,
         header=True
     )
 ),

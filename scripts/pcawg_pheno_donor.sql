@@ -17,6 +17,6 @@ select
         as BOOLEAN
     ) as sex
 from read_csv(
-    concat(getenv('DIR'), '/data/pcawg_donor_clinical_August2016_v9_sp'),
+    concat(getenv('data_dir'), '/pcawg_donor_clinical_August2016_v9_sp'),
     sep='\t'
 );

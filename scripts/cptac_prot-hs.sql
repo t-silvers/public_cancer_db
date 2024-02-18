@@ -10,7 +10,7 @@ with data_wide as (
         , cast(regexp_extract("filename", 'normalized_(\w+).txt', 1) as disease_ids) as cancer_status
         , * exclude ("filename") 
     from read_csv(
-        concat(getenv('DIR'), '/data/', getenv('CANCER'), '/', getenv('CANCER'), '_proteomics*'),
+        concat(getenv('data_dir'), '/', getenv('CANCER'), '/', getenv('CANCER'), '_proteomics*'),
         sep='\t',
         header=True,
         filename=True

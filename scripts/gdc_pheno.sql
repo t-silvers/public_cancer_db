@@ -33,7 +33,7 @@ select
         as BOOLEAN
     ) as sex
 from read_csv(
-    concat(getenv('DIR'), '/data/GDC-PANCAN.basic_phenotype.tsv.gz'),
+    concat(getenv('data_dir'), '/GDC-PANCAN.basic_phenotype.tsv.gz'),
     sep='\t'
 )
 where program != 'TARGET';

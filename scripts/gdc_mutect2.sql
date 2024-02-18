@@ -17,6 +17,9 @@ select
     , effect
     , cast(case when "filter" = 'PASS' then 1 else 0 end as BOOLEAN) as "filter"
     , cast(dna_vaf as REAL) as dna_vaf
-from read_csv(concat(getenv('DIR'), '/data/GDC-PANCAN.mutect2_snv.tsv.gz'), sep='\t');
+from read_csv(
+    concat(getenv('data_dir'), '/GDC-PANCAN.mutect2_snv.tsv.gz'),
+    sep='\t'
+);
 
 

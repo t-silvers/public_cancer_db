@@ -13,7 +13,7 @@ select
     , effect
     , gene as gene_name
 from read_csv(
-    concat(getenv('DIR'), '/data/sp%2FSNV.sp.codingMutation-allProjects.gz'),
+    concat(getenv('data_dir'), '/sp%2FSNV.sp.codingMutation-allProjects.gz'),
     sep='\t'
 );
 

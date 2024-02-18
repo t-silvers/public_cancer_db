@@ -77,7 +77,7 @@ select
     end as tissue
     , TCGA_GTEX_main_category AS tissue_category
 from read_csv(
-    concat(getenv('DIR'), '/data/TCGA_GTEX_category.txt'),
+    concat(getenv('data_dir'), '/TCGA_GTEX_category.txt'),
     sep='\t',
     header=true
 );

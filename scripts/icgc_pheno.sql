@@ -12,6 +12,6 @@ select
     , tumour_grade
     , tumour_stage
 from read_csv(
-    concat(getenv('DIR'), '/data/sp%2Fspecimen.all_projects.tsv.gz'),
+    concat(getenv('data_dir'), '/sp%2Fspecimen.all_projects.tsv.gz'),
     sep='\t'
 );

@@ -41,6 +41,6 @@ select
         as BOOLEAN
     ) as redacted
 from read_csv(
-    concat(getenv('DIR'), '/data/Survival_SupplementalTable_S1_20171025_xena_sp'),
+    concat(getenv('data_dir'), '/Survival_SupplementalTable_S1_20171025_xena_sp'),
     sep='\t'
 );

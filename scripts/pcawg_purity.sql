@@ -9,6 +9,6 @@ select
     samplename as sample_id
     , * exclude (samplename)
 from read_csv(
-    concat(getenv('DIR'), '/data/consensus.20170217.purity.ploidy_sp'),
+    concat(getenv('data_dir'), '/consensus.20170217.purity.ploidy_sp'),
     sep='\t'
 );

@@ -16,7 +16,7 @@ select
     , SIFT as sift
     , PolyPhen as poly_phen
 from read_csv(
-    concat(getenv('DIR'), '/data/mc3.v0.2.8.PUBLIC.toil.xena.gz'),
+    concat(getenv('data_dir'), '/mc3.v0.2.8.PUBLIC.toil.xena.gz'),
     sep='\t'
 );
 

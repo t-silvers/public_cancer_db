@@ -14,6 +14,6 @@ select
     , cast(chromStart as UBIGINT) as chrom_start
     , cast(chromEnd as UBIGINT) as chrom_end
 from read_csv(
-    concat(getenv('DIR'), '/data/gencode.v22.annotation.gene.probeMap'),
+    concat(getenv('data_dir'), '/gencode.v22.annotation.gene.probeMap'),
     sep='\t'
 );

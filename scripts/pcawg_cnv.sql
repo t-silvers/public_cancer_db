@@ -18,7 +18,7 @@ select
         else null
     end as star_eval
 from read_csv(
-    concat(getenv('DIR'), '/data/20170119_final_consensus_copynumber_sp'),
+    concat(getenv('data_dir'), '/20170119_final_consensus_copynumber_sp'),
     nullstr='NA',
     sep='\t'
 );

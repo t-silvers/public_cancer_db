@@ -10,10 +10,10 @@ with data_wide as (
         feature as gene_ensg
         , * exclude (feature)
     from read_csv(
-        concat(getenv('DIR'), '/data/tophat_star_fpkm_uq.v2_aliquot_gl.sp.log'),
+        concat(getenv('data_dir'), '/tophat_star_fpkm_uq.v2_aliquot_gl.sp.log'),
         sep='\t',
-        sample_size=1280,
-        parallel=True
+        parallel=True,
+        sample_size=1280
     )
 ),
 data_long as (

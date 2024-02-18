@@ -18,6 +18,6 @@ select
     , Variant_Classification as effect
     , try_cast(TumorVAF as real) as dna_vaf
 from read_csv(
-    concat(getenv('DIR'), '/data/*/*_somatic_mutation.maf'),
+    concat(getenv('data_dir'), '/*/*_somatic_mutation.maf'),
     filename=True
 );

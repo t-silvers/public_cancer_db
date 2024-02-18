@@ -11,8 +11,10 @@ with data_wide as (
         column00000 as gene_ensg
         , * exclude (column00000) 
     from read_csv(
-        concat(getenv('DIR'), '/data/GDC-PANCAN.gistic.tsv.gz'),
-        sep='\t', sample_size = 1280, parallel = True
+        concat(getenv('data_dir'), '/GDC-PANCAN.gistic.tsv.gz'),
+        sep='\t',
+        parallel=True,
+        sample_size=1280
     ) 
 ),
 data_long as (

@@ -13,6 +13,6 @@ select
     , try_cast(chromStart as UBIGINT) as chrom_start
     , try_cast(chromEnd as UBIGINT) as chrom_end
 from read_csv(
-    concat(getenv('DIR'), '/data/illuminaMethyl27_hg38_GDC'),
+    concat(getenv('data_dir'), '/illuminaMethyl27_hg38_GDC'),
     sep='\t'
 );

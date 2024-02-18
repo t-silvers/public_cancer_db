@@ -8,10 +8,10 @@ create table gdc_methyl450 as
 with data_wide as (
     select *
     from read_csv(
-        concat(getenv('DIR'), '/data/GDC-PANCAN.methylation450.tsv.gz'),
+        concat(getenv('data_dir'), '/GDC-PANCAN.methylation450.tsv.gz'),
         sep='\t',
-        sample_size=1280,
-        parallel=True
+        parallel=True,
+        sample_size=1280
     )
 ),
 data_long as (

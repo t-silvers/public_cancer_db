@@ -9,7 +9,7 @@ select
     icgc_specimen_id as sample_id
     , donor_wgs_exclusion_white_gray
 from read_csv(
-    concat(getenv('DIR'), '/data/sp_wgs_exclusion_white_gray'),
+    concat(getenv('data_dir'), '/sp_wgs_exclusion_white_gray'),
     sep='\t',
     header=True
 );

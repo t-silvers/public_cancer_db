@@ -18,7 +18,7 @@ select
         as BOOLEAN
     ) as sex
 from read_csv(
-    concat(getenv('DIR'), '/data/*/*_meta.txt'),
+    concat(getenv('data_dir'), '/*/*_meta.txt'),
     sep='\t',
     skip=0,
     header=True,
