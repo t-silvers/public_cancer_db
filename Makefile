@@ -69,11 +69,11 @@ db_targets := $(addsuffix .done, $(addprefix $(temp_dir)/,$(tbl_names)))
 
 .PHONY: create_index ingest
 
-# .INTERMEDIATE: $(db_targets)
-
 # TODO: Allow multiple makes to populate database when errors encountered.
 # 		Could also use `CREATE IF NOT EXISTS` in SQL, but will fail for CPTAC,
 # 		where table creation and insertion is separate.
+
+# .INTERMEDIATE: $(db_targets)
 
 .IGNORE: $(db_targets)
 

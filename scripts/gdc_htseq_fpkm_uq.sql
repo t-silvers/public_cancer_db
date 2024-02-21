@@ -6,7 +6,7 @@ set threads to getenv('NCORES');
 
 create table gdc_pancan_htseq_fpkm_uq as
 with data_wide as (
-    select 
+    select
         xena_sample as gene_ensg
         , * exclude (xena_sample) 
     from read_csv(
