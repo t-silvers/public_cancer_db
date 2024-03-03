@@ -1,9 +1,3 @@
-
-set enable_progress_bar = true;
-set memory_limit = getenv('MEMORY_LIMIT');
-set preserve_insertion_order = false;
-set threads to getenv('NCORES');
-
 create table cptac_meta as 
 select 
     try_cast(regexp_extract("filename", '/(\w+)_meta.txt', 1) as cancer_ids) as cancer
@@ -18,7 +12,7 @@ select
         as BOOLEAN
     ) as sex
 from read_csv(
-    concat(getenv('data_dir'), '/*/*_meta.txt'),
+    '/*/*_meta.txt',
     sep='\t',
     skip=0,
     header=True,

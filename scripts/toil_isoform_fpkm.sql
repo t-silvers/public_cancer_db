@@ -1,16 +1,10 @@
-
-set enable_progress_bar = true;
-set memory_limit = getenv('MEMORY_LIMIT');
-set preserve_insertion_order = false;
-set threads to getenv('NCORES');
-
 create table toil_isoform_fpkm as
 with data_wide as (
     select 
         "sample" as gene_enst
         , * exclude ("sample")
     from read_csv(
-        concat(getenv('data_dir'), '/TcgaTargetGtex_RSEM_isoform_fpkm.gz'),
+        'TcgaTargetGtex_RSEM_isoform_fpkm.gz',
         sep='\t',
         parallel=True,
         sample_size=1280

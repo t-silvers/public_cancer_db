@@ -1,9 +1,3 @@
-
-set enable_progress_bar = true;
-set memory_limit = getenv('MEMORY_LIMIT');
-set preserve_insertion_order = false;
-set threads to getenv('NCORES');
-
 -- TODO: Need better flow control here when types exist.
 drop type if exists assembly_ids;
 drop type if exists cancer_ids;
@@ -41,11 +35,11 @@ create type chrom_ids as enum (
 create type cpg_probe_ids as enum (
     select probe_id from (
         select "#id" as probe_id from read_csv(
-            concat(getenv('data_dir'), '/illuminaMethyl27_hg38_GDC'), sep='\t'
+            concat('illuminaMethyl27_hg38_GDC'), sep='\t'
         )
         union
         select "#id" as probe_id from read_csv(
-            concat(getenv('data_dir'), '/illuminaMethyl450_hg38_GDC'), sep='\t'
+            concat('illuminaMethyl450_hg38_GDC'), sep='\t'
         )
     )
 );
@@ -61,54 +55,36 @@ create type disease_ids as enum ('Healthy', 'Normal', 'Tumor');
 --
 
 create type gene_ensg_ids as enum (
-    select id from read_csv(
-        concat(getenv('data_dir'), '/gencode.v22.annotation.gene.probeMap'), sep='\t'
-    )
+    select id from read_csv('gencode.v22.annotation.gene.probeMap', sep='\t')
 );
 
 -- TODO: Alternative ENUM type for ENSTs? (198619 unique values)
 --       ... Yet casting works for some data sets ...
 
 create type gene_enst_ids as enum (
-    select id from read_csv(
-        concat(getenv('data_dir'), '/probeMap%2Fgencode.v23.annotation.transcript.probemap'), sep='\t'
-    )
+    select id from read_csv('probeMap%2Fgencode.v23.annotation.transcript.probemap', sep='\t')
 );
 
 -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 create type gene_name_ids as enum (
     select gene from (
-        select gene from read_csv(
-            concat(getenv('data_dir'), '/gencode.v22.annotation.gene.probeMap'), sep='\t'
-        )
+        select gene from read_csv('gencode.v22.annotation.gene.probeMap', sep='\t')
         union
-        select gene from read_csv(
-            concat(getenv('data_dir'), '/probeMap%2Fhugo_gencode_good_hg38_v23comp_probemap'), sep='\t'
-        )
+        select gene from read_csv('/probeMap%2Fhugo_gencode_good_hg38_v23comp_probemap', sep='\t')
         union
-        select gene from read_csv(
-            concat(getenv('data_dir'), '/mc3.v0.2.8.PUBLIC.toil.xena.gz'), sep='\t'
-        )
+        select gene from read_csv('mc3.v0.2.8.PUBLIC.toil.xena.gz', sep='\t')
         union
-        select gene from read_csv(
-            concat(getenv('data_dir'), '/probeMap%2Fgencode.v23.annotation.transcript.probemap'), sep='\t'
-        )
+        select gene from read_csv('probeMap%2Fgencode.v23.annotation.transcript.probemap', sep='\t')
     )
 );
 
 create type sample_ids as enum (
     select sample_id from (
-        select column0 as sample_id from read_csv(
-            concat(getenv('data_dir'), '/*/*_CaseList.txt'), header=False
-        )
+        select column0 as sample_id from read_csv('*/*_CaseList.txt', header=False)
         union
-        select "sample" as sample_id from read_csv(
-            concat(getenv('data_dir'), '/GDC-PANCAN.basic_phenotype.tsv.gz'), sep='\t'
-        )
+        select "sample" as sample_id from read_csv('GDC-PANCAN.basic_phenotype.tsv.gz', sep='\t')
         union
-        select "sample" from read_csv(
-            concat(getenv('data_dir'), '/TCGA_GTEX_category.txt'), sep='\t', header=true
-        )
+        select "sample" from read_csv('TCGA_GTEX_category.txt', sep='\t', header=true)
     )
 );

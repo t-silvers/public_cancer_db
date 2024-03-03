@@ -1,16 +1,10 @@
-
-set enable_progress_bar = true;
-set memory_limit = getenv('MEMORY_LIMIT');
-set preserve_insertion_order = false;
-set threads to getenv('NCORES');
-
 with data_wide as (
     select 
         cast(regexp_extract("filename", '/(\w+)_RNAseq_isoform_FPKM_log2_', 1) as cancer_ids) as cancer
         , cast(regexp_extract("filename", 'log2_(\w+).txt', 1) as disease_ids) as cancer_status
         , * exclude ("filename") 
     from read_csv(
-        concat(getenv('data_dir'), '/', getenv('CANCER'), '/', getenv('CANCER'), '_RNAseq_isoform_FPKM_log2_*'),
+        concat(getenv('CANCER'), '/', getenv('CANCER'), '_RNAseq_isoform_FPKM_log2_*'),
         sep='\t',
         header=True,
         filename=True,

@@ -1,16 +1,10 @@
-
-set enable_progress_bar = true;
-set memory_limit = getenv('MEMORY_LIMIT');
-set preserve_insertion_order = false;
-set threads to getenv('NCORES');
-
 create table gdc_methyl450 as
 with data_wide as (
     select
         cast("Composite Element REF" as cpg_probe_ids) as probe
         , * exclude ("Composite Element REF")
     from read_csv(
-        concat(getenv('data_dir'), '/GDC-PANCAN.methylation450.tsv.gz'),
+        'GDC-PANCAN.methylation450.tsv.gz',
         sep='\t',
         parallel=True,
         sample_size=1280

@@ -1,9 +1,3 @@
-
-set enable_progress_bar = true;
-set memory_limit = getenv('MEMORY_LIMIT');
-set preserve_insertion_order = false;
-set threads to getenv('NCORES');
-
 -- CSV parsing fails with `union_by_name=True`, even with `auto_detect=false` and custom configuration
 
 create table cptac_snv as 
@@ -17,7 +11,4 @@ select
     , try_cast(End_Position as UBIGINT) as chrom_end
     , Variant_Classification as effect
     , try_cast(TumorVAF as real) as dna_vaf
-from read_csv(
-    concat(getenv('data_dir'), '/*/*_somatic_mutation.maf'),
-    filename=True
-);
+from read_csv('/*/*_somatic_mutation.maf', filename=True);

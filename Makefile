@@ -6,6 +6,8 @@
 #
 # Primary targets:
 # - all: Executes the main pipeline, including download, extraction, and database preparation.
+# - fetch: Download data files.
+# - ingest: Add data to database.
 # - clean: Removes all generated files.
 #
 # Usage example:
@@ -81,7 +83,7 @@ ingest: directories create_index $(db_targets)
 
 create_index:
 	@echo Create data indices ...
-	@$(DUCKDB) $(DB) -bail -c ".read scripts/create_index.sql"
+	@$(DUCKDB) $(DB) -init $(db_config) -c ".read scripts/create_index.sql"
 
 # CPTAC data sets with heterogeneous schema across cancers
 het_schema_aliases := cptac_cnv cptac_exp_coding cptac_exp_isoform cptac_gistic cptac_prot
@@ -93,7 +95,7 @@ $(temp_dir)/%.done:
 		if echo "$(het_schema_aliases)" | grep -wq "$*"; then \
 			for cancer in BRCA CCRCC COAD GBM HNSCC LSCC LUAD OV PDAC UCEC; do \
 				export CANCER="$$cancer"; \
-				$(DUCKDB) $(DB) -bail -c ".read scripts/$*-hs.sql"; \
+				$(DUCKDB) $(DB) -init $(db_config) -c ".read scripts/$*-hs.sql"; \
 			done; \
 		fi; \
 	} && \

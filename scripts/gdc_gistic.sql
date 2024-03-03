@@ -1,9 +1,3 @@
-
-set enable_progress_bar = true;
-set memory_limit = getenv('MEMORY_LIMIT');
-set preserve_insertion_order = false;
-set threads to getenv('NCORES');
-
 create table gdc_gistic as
 with data_wide as (
     select 
@@ -11,7 +5,7 @@ with data_wide as (
         column00000 as gene_ensg
         , * exclude (column00000) 
     from read_csv(
-        concat(getenv('data_dir'), '/GDC-PANCAN.gistic.tsv.gz'),
+        'GDC-PANCAN.gistic.tsv.gz',
         sep='\t',
         parallel=True,
         sample_size=1280

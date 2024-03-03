@@ -1,9 +1,3 @@
-
-set enable_progress_bar = true;
-set memory_limit = getenv('MEMORY_LIMIT');
-set preserve_insertion_order = false;
-set threads to getenv('NCORES');
-
 create table gdc_illumina_methyl27 as
 select
     cast("#id" as cpg_probe_ids) as probe
@@ -12,7 +6,4 @@ select
     -- Some chromStart, chromEnd are -1
     , try_cast(chromStart as UBIGINT) as chrom_start
     , try_cast(chromEnd as UBIGINT) as chrom_end
-from read_csv(
-    concat(getenv('data_dir'), '/illuminaMethyl27_hg38_GDC'),
-    sep='\t'
-);
+from read_csv('illuminaMethyl27_hg38_GDC', sep='\t');

@@ -1,9 +1,3 @@
-
-set enable_progress_bar = true;
-set memory_limit = getenv('MEMORY_LIMIT');
-set preserve_insertion_order = false;
-set threads to getenv('NCORES');
-
 create table pcawg_pheno_donor as 
 select 
     xena_sample as sample_id
@@ -16,7 +10,4 @@ select
         end
         as BOOLEAN
     ) as sex
-from read_csv(
-    concat(getenv('data_dir'), '/pcawg_donor_clinical_August2016_v9_sp'),
-    sep='\t'
-);
+from read_csv('pcawg_donor_clinical_August2016_v9_sp', sep='\t');

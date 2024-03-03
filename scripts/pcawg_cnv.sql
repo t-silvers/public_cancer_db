@@ -1,9 +1,3 @@
-
-set enable_progress_bar = true;
-set memory_limit = getenv('MEMORY_LIMIT');
-set preserve_insertion_order = false;
-set threads to getenv('NCORES');
-
 create table pcawg_cnv as 
 select 
     sampleID as sample_id
@@ -18,10 +12,11 @@ select
         else null
     end as star_eval
 from read_csv(
-    concat(getenv('data_dir'), '/20170119_final_consensus_copynumber_sp'),
+    '20170119_final_consensus_copynumber_sp',
     nullstr='NA',
     sep='\t'
-);
+)
+order by chrom_start;
 
 alter table pcawg_cnv
 add column "assembly" assembly_ids default 'hg19';

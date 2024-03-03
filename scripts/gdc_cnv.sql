@@ -13,7 +13,8 @@ select
     , cast("Start" as UBIGINT) as chrom_start
     , cast("End" as UBIGINT) as chrom_end
     , cast("value" as REAL) as "value"
-from read_csv(concat(getenv('data_dir'), '/GDC-PANCAN.cnv.tsv.gz'), sep='\t');
+from read_csv('GDC-PANCAN.cnv.tsv.gz', sep='\t')
+order by chrom_start;
 
 alter table gdc_cnv
 add column "assembly" assembly_ids default 'hg38';

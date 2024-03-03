@@ -1,9 +1,3 @@
-
-set enable_progress_bar = true;
-set memory_limit = getenv('MEMORY_LIMIT');
-set preserve_insertion_order = false;
-set threads to getenv('NCORES');
-
 create table tcga_survival as 
 select 
     try_cast("sample" as sample_ids) as sample_id
@@ -40,7 +34,4 @@ select
         end
         as BOOLEAN
     ) as redacted
-from read_csv(
-    concat(getenv('data_dir'), '/Survival_SupplementalTable_S1_20171025_xena_sp'),
-    sep='\t'
-);
+from read_csv('Survival_SupplementalTable_S1_20171025_xena_sp', sep='\t');

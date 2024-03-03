@@ -29,6 +29,8 @@ data_config ?= config/data.csv
 tbl_names := $(shell awk -F, 'NR>1 {print $$1}' $(data_config) | sort | uniq)
 urls := $(shell awk -F, 'NR>1 {print $$2}' $(data_config) | sort | uniq)
 
+db_config ?= config/duckdb_cfg.sql
+
 #
 # Configuration
 #

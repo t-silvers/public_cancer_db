@@ -1,9 +1,3 @@
-
-set enable_progress_bar = true;
-set memory_limit = getenv('MEMORY_LIMIT');
-set preserve_insertion_order = false;
-set threads to getenv('NCORES');
-
 create table gdc_pheno as 
 select 
     -- cast("sample" as sample_ids) as sample_id
@@ -32,8 +26,5 @@ select
         end
         as BOOLEAN
     ) as sex
-from read_csv(
-    concat(getenv('data_dir'), '/GDC-PANCAN.basic_phenotype.tsv.gz'),
-    sep='\t'
-)
+from read_csv('GDC-PANCAN.basic_phenotype.tsv.gz', sep='\t')
 where program != 'TARGET';

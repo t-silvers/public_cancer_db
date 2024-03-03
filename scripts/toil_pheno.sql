@@ -1,9 +1,3 @@
-
-set enable_progress_bar = true;
-set memory_limit = getenv('MEMORY_LIMIT');
-set preserve_insertion_order = false;
-set threads to getenv('NCORES');
-
 -- TODO: Revise harmonized tissue types
 
 create table toil_pheno as
@@ -77,7 +71,7 @@ select
     end as tissue
     , TCGA_GTEX_main_category AS tissue_category
 from read_csv(
-    concat(getenv('data_dir'), '/TCGA_GTEX_category.txt'),
+    'TCGA_GTEX_category.txt',
     sep='\t',
     header=true
 );

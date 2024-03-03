@@ -1,16 +1,10 @@
-
-set enable_progress_bar = true;
-set memory_limit = getenv('MEMORY_LIMIT');
-set preserve_insertion_order = false;
-set threads to getenv('NCORES');
-
 create table icgc_prot as 
 with data_wide as (
     select 
         "sample" as gene_name
         , * exclude ("sample") 
     from read_csv(
-        concat(getenv('data_dir'), '/sp%2Fprotein_expression.all_projects.specimen.xena.tsv.gz'),
+        'sp%2Fprotein_expression.all_projects.specimen.xena.tsv.gz',
         sep='\t',
         sample_size=1280
     )

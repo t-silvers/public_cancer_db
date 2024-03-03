@@ -1,16 +1,10 @@
-
-set enable_progress_bar = true;
-set memory_limit = getenv('MEMORY_LIMIT');
-set preserve_insertion_order = false;
-set threads to getenv('NCORES');
-
 create table gdc_pancan_htseq_fpkm_uq as
 with data_wide as (
     select
         xena_sample as gene_ensg
         , * exclude (xena_sample) 
     from read_csv(
-        concat(getenv('data_dir'), '/GDC-PANCAN.htseq_fpkm-uq.tsv.gz'),
+        'GDC-PANCAN.htseq_fpkm-uq.tsv.gz',
         sep='\t',
         nullstr='nan',
         parallel=True,
