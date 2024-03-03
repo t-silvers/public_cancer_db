@@ -1,4 +1,3 @@
-
 create table gdc_cnv as 
 select 
     -- cast("sample" as sample_ids) as sample_id
