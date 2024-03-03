@@ -83,19 +83,19 @@ ingest: directories create_index $(db_targets)
 
 create_index:
 	@echo Create data indices ...
-	@$(DUCKDB) $(DB) -init $(db_config) -c ".read scripts/create_index.sql"
+	@$(DUCKDB) $(DB) -init $(db_config) -c ".read models/create_index.sql"
 
 # CPTAC data sets with heterogeneous schema across cancers
 het_schema_aliases := cptac_cnv cptac_exp_coding cptac_exp_isoform cptac_gistic cptac_prot
 
 $(temp_dir)/%.done:
 	@echo Ingesting $* ...
-	@$(DUCKDB) $(DB) -bail -c ".read scripts/$*.sql" && \
+	@$(DUCKDB) $(DB) -bail -c ".read models/$*.sql" && \
 	{ \
 		if echo "$(het_schema_aliases)" | grep -wq "$*"; then \
 			for cancer in BRCA CCRCC COAD GBM HNSCC LSCC LUAD OV PDAC UCEC; do \
 				export CANCER="$$cancer"; \
-				$(DUCKDB) $(DB) -init $(db_config) -c ".read scripts/$*-hs.sql"; \
+				$(DUCKDB) $(DB) -init $(db_config) -c ".read models/$*-hs.sql"; \
 			done; \
 		fi; \
 	} && \
