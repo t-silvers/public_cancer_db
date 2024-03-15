@@ -81,6 +81,9 @@ db_targets := $(addsuffix .done, $(addprefix $(temp_dir)/,$(tbl_names)))
 
 ingest: directories create_index $(db_targets)
 
+# TODO: Once support added for the DuckDB config to change directories,
+# 		will need to change paths for model scripts.
+
 create_index:
 	@echo Create data indices ...
 	@$(DUCKDB) $(DB) -init $(db_config) -c ".read models/create_index.sql"

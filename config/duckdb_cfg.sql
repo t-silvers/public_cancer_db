@@ -1,5 +1,6 @@
 .bail on
-.cd getenv('data_dir')
+-- TODO: Doesn't work as expected
+-- .cd getenv('data_dir')
 .prompt 'duckdb> '
 
 set enable_progress_bar = true;
